@@ -1,0 +1,76 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - veiculos-network
+
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - veiculos-network
+
+  cadastro-veiculos:
+    build:
+      context: ./cadastro-veiculos
+      dockerfile: Dockerfile
+    container_name: cadastro-veiculos
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongo:27017/veiculos_cadastro
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - QUEUE_NAME=veiculos_cadastrados
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+    networks:
+      - veiculos-network
+    restart: unless-stopped
+
+  listagem-veiculos:
+    build:
+      context: ./listagem-veiculos
+      dockerfile: Dockerfile
+    container_name: listagem-veiculos
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGODB_URI=mongodb://mongo:27017/veiculos_listagem
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - QUEUE_NAME=veiculos_cadastrados
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+    networks:
+      - veiculos-network
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
+
+networks:
+  veiculos-network:
+    driver: bridge

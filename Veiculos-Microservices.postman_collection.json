@@ -1,0 +1,82 @@
+{
+  "info": {
+    "name": "Veiculos Microservices",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Cadastro de Veículos",
+      "item": [
+        {
+          "name": "Cadastrar Veículo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"marca\": \"Toyota\",\n  \"modelo\": \"Corolla\",\n  \"ano\": 2023,\n  \"cor\": \"Prata\",\n  \"preco\": 120000,\n  \"placa\": \"ABC1D23\"\n}"
+            },
+            "url": "http://localhost:3001/api/veiculos"
+          }
+        },
+        {
+          "name": "Listar Veículos Cadastrados",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3001/api/veiculos"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Listagem de Veículos",
+      "item": [
+        {
+          "name": "Listar Veículos com Filtros",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3002/api/veiculos"
+          }
+        },
+        {
+          "name": "Buscar por Placa",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3002/api/veiculos/ABC1D23"
+          }
+        },
+        {
+          "name": "Estatísticas",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3002/api/veiculos/estatisticas/geral"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Checks",
+      "item": [
+        {
+          "name": "Cadastro Health",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3001/health"
+          }
+        },
+        {
+          "name": "Listagem Health",
+          "request": {
+            "method": "GET",
+            "url": "http://localhost:3002/health"
+          }
+        }
+      ]
+    }
+  ]
+}
