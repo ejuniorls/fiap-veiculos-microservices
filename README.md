@@ -18,7 +18,8 @@ A aplicação é dividida em dois microsserviços:
 
 Responsável por:
 - Receber requisições para cadastro de veículos
-- Validar os dados recebidos; - Persistir os dados no banco de dados
+- Validar os dados recebidos
+- Persistir os dados no banco de dados
 - Publicar um evento informando que um novo veículo foi cadastrado
 
 ### 2. Microsserviço de Listagem de Veículos
@@ -36,35 +37,31 @@ A comunicação entre os microsserviços é realizada por meio de um message bro
 ## Tecnologias Utilizadas
  - Node.js
  - Express
- - MongoDB ou PostgreSQL
- - Message Broker (RabbitMQ, Kafka ou Redis Pub/Sub)
+ - MongoDB
+ - Message Broker RabbitMQ
  - Docker e Docker Compose
- - Swagger (OpenAPI) ou Postman para documentação da API
+ - Postman para documentação da API
 
 ------------------------------------------------------------------------
 
 ## Estrutura do Projeto
 
-    /cadastro-veiculos
-        ├── controllers
-        ├── services
-        ├── routes
-        ├── events
-        ├── app.js
-        ├── Dockerfile
-        └── README.md
-
-    /listagem-veiculos
-        ├── controllers
-        ├── services
-        ├── routes
-        ├── events
-        ├── app.js
-        ├── Dockerfile
-        └── README.md
-
-    docker-compose.yml
-    Veiculos-Microservices.postman_collection.json
+    ├── cadastro-veiculos
+    |   ├── controllers
+    |   ├── services
+    |   ├── routes
+    |   ├── app.js
+    |   └── Dockerfile
+    |
+    ├── listagem-veiculos
+    |   ├── controllers
+    |   ├── services
+    |   ├── routes
+    |   ├── app.js
+    |   └── Dockerfile
+    |
+    ├── docker-compose.yml
+    └── Veiculos-Microservices.postman_collection.json
 
 ------------------------------------------------------------------------
 
@@ -72,7 +69,7 @@ A comunicação entre os microsserviços é realizada por meio de um message bro
  1. O cliente realiza uma requisição HTTP para o microsserviço de cadastro.
  2. Os dados do veículo são validados.
  3. O veículo é salvo no banco de dados.
- 4. Um evento `vehicle.created` é publicado no message broker.
+ 4. Um evento é publicado no message broker.
  5. O microsserviço de listagem consome o evento.
  6. Os dados do veículo são armazenados localmente.
  7. O cliente pode consultar os veículos por meio dos endpoints de listagem.
@@ -83,30 +80,33 @@ A comunicação entre os microsserviços é realizada por meio de um message bro
 
 ### Microsserviço de Cadastro
 
--   `POST /vehicles`
+-   `POST http://localhost:3001/api/veiculos`
     -   Cadastra um novo veículo.
 
-    -   Exemplo de payload:
+      -   Exemplo de payload:
 
-        ``` json
-        {
-          "marca": "Toyota",
-          "modelo": "Corolla",
-          "ano": 2022,
-          "placa": "ABC1D23"
-        }
-        ```
+          ``` json
+          {
+              "marca": "Hyunday",
+              "modelo": "Creta",
+              "ano": 2023,
+              "cor": "Prata",
+              "preco": 120000,
+              "placa": "ABC1D30"
+          }
+          ```
 
 ### Microsserviço de Listagem
 
--   `GET /vehicles`
+-   `GET http://localhost:3002/api/veiculos`
     -   Lista todos os veículos cadastrados.
     -   Permite filtros por query params:
         -   `marca`
         -   `ano`
--   `GET /vehicles/:id`
-    -   Retorna os dados de um veículo específico.
-
+-   `GET http://localhost:3002/api/veiculos/ABC1D23`
+    -   Retorna os dados de um veículo por placa.
+-   `GET http://localhost:3002/api/veiculos/estatisticas/geral`
+    -   Retorna as estatísticas dos veículos cadastrados.
 ------------------------------------------------------------------------
 
 ## Validações
@@ -138,7 +138,7 @@ A documentação dos endpoints pode ser acessada por meio de:
 ### Subindo os serviços
 
 ``` bash
-docker-compose up --build
+docker-compose up -d
 ```
 
 Após a inicialização:
